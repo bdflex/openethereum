@@ -32,7 +32,7 @@ use snapshot::{
 	PowSnapshot,
 };
 use parking_lot::{Mutex, RwLock};
-use snappy;
+use snap;
 use keccak_hash::KECCAK_NULL_RLP;
 use kvdb::DBTransaction;
 use ethcore::test_helpers;
@@ -97,7 +97,8 @@ fn chunk_and_restore(amount: u64) {
 	let flag = AtomicBool::new(true);
 	for chunk_hash in &reader.manifest().block_hashes {
 		let compressed = reader.chunk(*chunk_hash).unwrap();
-		let chunk = snappy::decompress(&compressed).unwrap();
+		let mut chunk = Vec::with_capacity(snap::raw::decompress_len(&compressed).unwrap());
+		snap::raw::Decoder::new().decompress(&compressed, &mut chunk).unwrap();
 		rebuilder.feed(&chunk, engine.as_ref(), &flag).unwrap();
 	}
 

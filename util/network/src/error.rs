@@ -17,7 +17,7 @@
 use std::{error, io, net, fmt};
 use libc::{ENFILE, EMFILE};
 use io::IoError;
-use {rlp, crypto, snappy};
+use {rlp, crypto, snap};
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum DisconnectReason
@@ -87,7 +87,7 @@ pub enum Error {
 	/// Socket IO error.
 	SocketIo(IoError),
 	/// Decompression error.
-	Decompression(snappy::InvalidInput),
+	Decompression(snap::Error),
 	/// Rlp decoder error.
 	Rlp(rlp::DecoderError),
 	/// Error concerning the network address parsing subsystem.
@@ -160,8 +160,8 @@ impl From<IoError> for Error {
 	}
 }
 
-impl From<snappy::InvalidInput> for Error {
-	fn from(err: snappy::InvalidInput) -> Self {
+impl From<snap::Error> for Error {
+	fn from(err: snap::Error) -> Self {
 		Error::Decompression(err)
 	}
 }

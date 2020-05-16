@@ -24,8 +24,8 @@ use log::{debug, trace, warn};
 use mio::*;
 use mio::deprecated::{EventLoop, Handler};
 use mio::tcp::*;
-use parity_snappy as snappy;
 use rlp::{EMPTY_LIST_RLP, Rlp, RlpStream};
+use snap;
 
 use ethcore_io::{IoContext, StreamToken};
 use network::{DisconnectReason, Error, PeerCapabilityInfo, ProtocolId, SessionInfo};
@@ -287,7 +287,7 @@ impl Session {
 			if payload.len() > MAX_PAYLOAD_SIZE {
 				return Err(Error::OversizedPacket);
 			}
-			let len = snappy::compress_into(&payload, &mut compressed);
+			let len = snap::raw::Encoder::new().compress(&payload, &mut compressed).expect("size always correct; qed");
 			trace!(target: "network", "compressed {} to {}", payload.len(), len);
 			payload = &compressed[0..len];
 		}
@@ -343,10 +343,13 @@ impl Session {
 		}
 		let data = if self.compression {
 			let compressed = &packet.data[1..];
-			if snappy::decompressed_len(&compressed)? > MAX_PAYLOAD_SIZE {
+			let out_len = snap::raw::decompress_len(&compressed)?;
+			if out_len > MAX_PAYLOAD_SIZE {
 				return Err(Error::OversizedPacket);
 			}
-			snappy::decompress(&compressed)?
+			let mut data = Vec::with_capacity(out_len);
+			snap::raw::Decoder::new().decompress(&compressed, &mut data)?;
+			data
 		} else {
 			packet.data[1..].to_owned()
 		};

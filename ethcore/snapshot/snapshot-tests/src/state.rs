@@ -86,7 +86,8 @@ fn snap_and_restore() {
 
 		for chunk_hash in &reader.manifest().state_hashes {
 			let raw = reader.chunk(*chunk_hash).unwrap();
-			let chunk = snappy::decompress(&raw).unwrap();
+			let mut chunk = Vec::with_capacity(snap::raw::decompress_len(&raw).unwrap());
+			snap::raw::Decoder::new().decompress(&raw, &mut chunk).unwrap();
 
 			rebuilder.feed(&chunk, &flag).unwrap();
 		}
@@ -210,7 +211,8 @@ fn checks_flag() {
 
 		for chunk_hash in &reader.manifest().state_hashes {
 			let raw = reader.chunk(*chunk_hash).unwrap();
-			let chunk = snappy::decompress(&raw).unwrap();
+			let mut chunk = Vec::with_capacity(snap::raw::decompress_len(&raw).unwrap());
+			snap::raw::Decoder::new().decompress(&raw, &mut chunk).unwrap();
 
 			match rebuilder.feed(&chunk, &flag) {
 				Err(Error::Snapshot(SnapshotError::RestorationAborted)) => {},
