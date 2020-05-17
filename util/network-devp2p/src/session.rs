@@ -287,6 +287,7 @@ impl Session {
 			if payload.len() > MAX_PAYLOAD_SIZE {
 				return Err(Error::OversizedPacket);
 			}
+			compressed.reserve(snap::raw::max_compress_len(payload.len()));
 			let len = snap::raw::Encoder::new().compress(&payload, &mut compressed).expect("size always correct; qed");
 			trace!(target: "network", "compressed {} to {}", payload.len(), len);
 			payload = &compressed[0..len];
