@@ -33,23 +33,11 @@
 
 #![warn(missing_docs, unused_extern_crates)]
 
-extern crate ethbloom;
-extern crate ethereum_types;
-extern crate ethjson;
-extern crate parity_crypto;
 #[macro_use]
 extern crate derive_more;
-extern crate keccak_hash as hash;
-extern crate parity_bytes as bytes;
-extern crate patricia_trie_ethereum as ethtrie;
-extern crate parity_snappy;
-extern crate rlp;
-extern crate unexpected;
 
 #[macro_use]
 extern crate rlp_derive;
-extern crate parity_util_mem;
-extern crate parity_util_mem as malloc_size_of;
 
 #[cfg(test)]
 extern crate rustc_hex;

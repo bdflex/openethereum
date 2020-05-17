@@ -16,14 +16,16 @@
 
 //! View onto block body rlp.
 
+use super::ViewRlp;
+use crate::{
+	BlockNumber,
+	header::Header,
+	transaction::{LocalizedTransaction, UnverifiedTransaction},
+	views::{TransactionView, HeaderView},
+};
 use bytes::Bytes;
 use ethereum_types::H256;
 use hash::keccak;
-use header::Header;
-use transaction::{LocalizedTransaction, UnverifiedTransaction};
-use views::{TransactionView, HeaderView};
-use super::ViewRlp;
-use BlockNumber;
 
 /// View onto block rlp.
 pub struct BodyView<'a> {
